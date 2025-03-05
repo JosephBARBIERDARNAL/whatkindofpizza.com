@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What Pizza Are You? 🍕</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #ff5722;
+        --primary-light: #ff8a65;
+        --primary-dark: #e64a19;
+        --secondary: #ffd54f;
+        --secondary-dark: #ffc107;
+        --background: #fffaf7;
+        --white: #fff;
+        --text-dark: #37474f;
+        --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        --box-shadow-hover: 0 15px 35px rgba(255, 87, 34, 0.2);
+      }
+
+      body {
+        background: var(--background);
+        font-family: "Poppins", sans-serif;
+        min-height: 100vh;
+        padding: 0;
+        margin: 0;
+        color: var(--text-dark);
+        overflow-x: hidden;
+        background-image: radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 87, 34, 0.05) 0%,
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(255, 152, 0, 0.07) 0%,
+            transparent 30%
+          );
+      }
+
+      .pizza-background {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0.2;
+        overflow: hidden;
+      }
+
+      .bg-pizza {
+        position: absolute;
+        font-size: 5rem;
+        opacity: 0.4;
+        animation: float-pizza 20s infinite linear;
+      }
+
+      @keyframes float-pizza {
+        0% {
+          transform: translate(-20vw, -20vh) rotate(0deg);
+        }
+        100% {
+          transform: translate(120vw, 120vh) rotate(360deg);
+        }
+      }
+
+      .header {
+        position: relative;
+        overflow: hidden;
+        padding-top: 100px;
+        padding-bottom: 60px;
+        text-align: center;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 87, 34, 0.1) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+      }
+
+      h1 {
+        font-family: "Fredoka One", cursive;
+        color: var(--primary);
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 0px var(--secondary);
+        transform-origin: center;
+        animation: pulse 2s infinite alternate ease-in-out;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.05);
+        }
+      }
+
+      .subtitle {
+        color: var(--text-dark);
+        font-size: 1.2rem;
+        margin-bottom: 40px;
+        opacity: 0.8;
+      }
+
+      #quiz-container {
+        background: var(--white);
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: var(--box-shadow);
+        margin-bottom: 60px;
+        position: relative;
+        transform: translateY(0);
+        transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+      }
+
+      #quiz-container:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--box-shadow-hover);
+      }
+
+      .question-counter {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--secondary);
+        color: var(--text-dark);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .progress-container {
+        height: 8px;
+        background: #f5f5f5;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--secondary), var(--primary));
+        width: 0%;
+        border-radius: 4px;
+        transition: width 0.4s ease;
+      }
+
+      .question {
+        font-size: 1.5rem;
+        color: var(--text-dark);
+        margin-bottom: 30px;
+        min-height: 60px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+
+      .answers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+      }
+
+      .answer-btn {
+        background: var(--white);
+        border: 2px solid #e0e0e0;
+        border-radius: 16px;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-align: left;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .answer-btn::after {
+        content: "";
+        position: absolute;
+        background: linear-gradient(
+          90deg,
+          var(--primary-light),
+          var(--primary)
+        );
+        width: 5px;
+        height: calc(100% - 16px);
+        left: 4px;
+        top: 8px;
+        border-radius: 3px;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+      }
+
+      .answer-btn:hover {
+        border-color: var(--primary-light);
+        background: #fff9f7;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .answer-btn:hover::after {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .answer-btn:active {
+        transform: translateY(0);
+      }
+
+      .answer-icon {
+        margin-right: 12px;
+        font-size: 1.4rem;
+      }
+
+      #result-container {
+        text-align: center;
+        padding: 20px 30px 40px;
+      }
+
+      .result-header {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+        font-weight: 600;
+      }
+
+      .pizza-emoji {
+        font-size: 5rem;
+        margin: 20px 0;
+        display: inline-block;
+        animation: pizzaAppear 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+      }
+
+      @keyframes pizzaAppear {
+        0% {
+          transform: scale(0) rotate(-180deg);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.2) rotate(10deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+      }
+
+      .pizza-result {
+        font-family: "Fredoka One", cursive;
+        font-size: 2.4rem;
+        color: var(--primary);
+        margin: 20px 0;
+        text-shadow: 1px 1px 0px var(--secondary-dark);
+      }
+
+      .pizza-desc {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--text-dark);
+        margin: 0 auto 30px;
+        max-width: 600px;
+      }
+
+      .retry-btn {
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        border: none;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        color: white;
+        border-radius: 50px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(255, 87, 34, 0.3);
+        font-family: "Poppins", sans-serif;
+        font-weight: 600;
+        display: inline-block;
+      }
+
+      .retry-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 87, 34, 0.4);
+      }
+
+      .retry-btn:active {
+        transform: translateY(0);
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+        opacity: 0;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .confetti-container {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #f0f;
+        border-radius: 50%;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9rem;
+        color: #888;
+        margin-top: 40px;
+      }
+
+      /* Media queries for responsive design */
+      @media (max-width: 768px) {
+        .header {
+          padding-top: 60px;
+          padding-bottom: 40px;
+        }
+        #quiz-container {
+          padding: 30px 20px;
+        }
+        .answers-grid {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pizza-background">
+      <!-- Background pizzas will be added by JS -->
+    </div>
+
+    <div class="header">
+      <div class="container">
+        <h1 class="animate__animated animate__bounceIn">
+          What Pizza Are You? 🍕
+        </h1>
+        <p class="subtitle animate__animated animate__fadeIn animate__delay-1s">
+          Discover your saucy personality in this cheesy quiz!
+        </p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="quiz-container" class="animate__animated animate__fadeInUp">
+        <div id="question-container"></div>
+        <div id="result-container"></div>
+      </div>
+    </div>
+
+    <footer>Made with 🧀 by Joseph Barbier</footer>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+      const questions = [
+        {
+          question: "🍕 When the pizza delivery is late, you...",
+          answers: [
+            { text: "Call them 15 times (emergency!)", icon: "🤬" },
+            { text: "Start eating the cardboard box", icon: "📦" },
+            {
+              text: "Practice your 'disappointed' face in the mirror",
+              icon: "😒",
+            },
+            { text: "Become one with the couch", icon: "🛋️" },
+          ],
+          scores: [
+            { PEPPERONI: 2, SUPREME: 1 },
+            { CHEESE: 3, HAWAIIAN: 1 },
+            { MARGHERITA: 2, VEGGIE: 1 },
+            { MEAT_LOVERS: 1, BUFFALO: 2 },
+          ],
+        },
+        {
+          question: "💪 Your ideal superpower?",
+          answers: [
+            { text: "Invisibility (to sneak extra slices)", icon: "👻" },
+            { text: "Time travel (to eat pizza forever)", icon: "⏰" },
+            { text: "Teleportation (instant pizza delivery)", icon: "⚡" },
+            { text: "Super digestion (unlimited pizza capacity)", icon: "🦸" },
+          ],
+          scores: [
+            { MEXICAN: 2, BBQ_CHICKEN: 1 },
+            { CHEESE: 3, MARGHERITA: 1 },
+            { SUPREME: 2, PEPPERONI: 1 },
+            { MEAT_LOVERS: 3, BUFFALO: 1 },
+          ],
+        },
+        {
+          question: "🕺 Your pizza dance style?",
+          answers: [
+            { text: "Hot cheese twerking", icon: "💃" },
+            { text: "Pepperoni finger snaps", icon: "👌" },
+            { text: "Mushroom shuffle", icon: "🍄" },
+            { text: "Full pizza box breakdance", icon: "📦" },
+          ],
+          scores: [
+            { BBQ_CHICKEN: 2, HAWAIIAN: 1 },
+            { PEPPERONI: 3, SUPREME: 1 },
+            { VEGGIE: 3, MARGHERITA: 1 },
+            { BUFFALO: 2, MEXICAN: 2 },
+          ],
+        },
+        {
+          question: "🧐 Perfect pizza ratio?",
+          answers: [
+            { text: "90% cheese, 10% air", icon: "🧀" },
+            { text: "Crust so stuffed it's a breadstick", icon: "🥖" },
+            { text: "Enough toppings to break physics", icon: "🎭" },
+            { text: "Sauce that's basically ketchup", icon: "🍅" },
+          ],
+          scores: [
+            { CHEESE: 3, MARGHERITA: 1 },
+            { SUPREME: 2, MEAT_LOVERS: 2 },
+            { PEPPERONI: 2, MEXICAN: 2 },
+            { BUFFALO: 3, BBQ_CHICKEN: 1 },
+          ],
+        },
+        {
+          question: "🎉 Friday night plans?",
+          answers: [
+            { text: "Pajama pizza party for one", icon: "🛌" },
+            { text: "Hosting a pizza eating contest", icon: "🏆" },
+            { text: "Trying that weird fusion pizza place", icon: "🧪" },
+            { text: "Making pizza art on the ceiling", icon: "🎨" },
+          ],
+          scores: [
+            { MARGHERITA: 2, VEGGIE: 1 },
+            { PEPPERONI: 3, MEAT_LOVERS: 2 },
+            { HAWAIIAN: 2, MEXICAN: 2 },
+            { CHEESE: 3, SUPREME: 1 },
+          ],
+        },
+        {
+          question: "🍍 Pineapple on pizza:",
+          answers: [
+            { text: "Culinary crime!", icon: "🚫" },
+            { text: "Sweet and savory perfection", icon: "😍" },
+            { text: "Only with Canadian bacon", icon: "🇨🇦" },
+            { text: "I'll eat anything on pizza", icon: "🤷" },
+          ],
+          scores: [
+            { MARGHERITA: 2, PEPPERONI: 1 },
+            { HAWAIIAN: 3, BBQ_CHICKEN: 1 },
+            { HAWAIIAN: 2, SUPREME: 1 },
+            { CHEESE: 3, MEXICAN: 2 },
+          ],
+        },
+      ];
+
+      const pizzaTypes = {
+        MARGHERITA: {
+          name: "Classic Margherita 🧑‍🍳",
+          desc: "You're a timeless classic! Simple but secretly sophisticated, you keep life cheesy and delicious. You appreciate the little things but won't say no to a fancy wine pairing.",
+          emoji: "🍕",
+        },
+        PEPPERONI: {
+          name: "Pepperoni Party 🎉",
+          desc: "Life's a party and you're the host! Bold, spicy, and always up for a good time. You're the friend who always knows where the fun is... and the antacids.",
+          emoji: "🍕",
+        },
+        VEGGIE: {
+          name: "Veggie Delight 🌱",
+          desc: "Crunchy, healthy, and environmentally conscious! You're basically a superhero in yoga pants. Your perfect day includes farmers markets and compostable pizza boxes.",
+          emoji: "🍕",
+        },
+        HAWAIIAN: {
+          name: "Hawaiian Controversy 🍍",
+          desc: "Sweet, tropical, and unapologetically yourself! You don't care about the haters - you know pineapple belongs on pizza and you've got the beach vibes to prove it.",
+          emoji: "🍕",
+        },
+        MEAT_LOVERS: {
+          name: "Meat Mountain 🥩",
+          desc: "All meat, all the time! You're a carnivorous champion who believes any meal without bacon is just a missed opportunity. Your spirit animal is a T-Rex with a napkin.",
+          emoji: "🍕",
+        },
+        SUPREME: {
+          name: "Everything Supreme 🎲",
+          desc: "Why choose when you can have it all? You're adventurous, spontaneous, and probably have 17 different hobbies. FOMO is your middle name!",
+          emoji: "🍕",
+        },
+        BBQ_CHICKEN: {
+          name: "BBQ Chicken Rebel 🤠",
+          desc: "Sweet, smoky, and breaking all the rules! You're that cool friend who makes their own path. Bonus points if you actually own cowboy boots.",
+          emoji: "🍕",
+        },
+        BUFFALO: {
+          name: "Buffalo Wild Child 🌶️",
+          desc: "Spicy, bold, and slightly dangerous! You're the life of the party who always has hot sauce in your bag. Warning: May cause sweating and spontaneous karaoke.",
+          emoji: "🍕",
+        },
+        MEXICAN: {
+          name: "Taco Pizza Fiesta 🌮",
+          desc: "¡Olé! You're a flavor explosion waiting to happen! Part pizza, part taco, all awesome. Your guacamole recipe is probably illegal in 3 states.",
+          emoji: "🍕",
+        },
+        CHEESE: {
+          name: "Extra Cheese Extreme 🧀",
+          desc: "Pure, unadulterated cheese bliss! You're comfort personified - the human equivalent of a Netflix binge in fuzzy socks. Caution: Highly melty and addictive.",
+          emoji: "🍕",
+        },
+      };
+
+      let currentQuestion = 0;
+      let pizzaScore = {};
+
+      function createPizzaBackground() {
+        const pizzaContainer = document.querySelector(".pizza-background");
+        const pizzaEmojis = ["🍕", "🧀", "🍅", "🫑", "🍄", "🥓", "🍍"];
+
+        for (let i = 0; i < 15; i++) {
+          const pizza = document.createElement("div");
+          pizza.classList.add("bg-pizza");
+          pizza.textContent =
+            pizzaEmojis[Math.floor(Math.random() * pizzaEmojis.length)];
+          pizza.style.left = `${Math.random() * 100}vw`;
+          pizza.style.top = `${Math.random() * 100}vh`;
+          pizza.style.animationDuration = `${15 + Math.random() * 20}s`;
+          pizza.style.animationDelay = `${Math.random() * 5}s`;
+          pizza.style.transform = `rotate(${Math.random() * 360}deg) scale(${
+            0.5 + Math.random() * 0.5
+          })`;
+          pizzaContainer.appendChild(pizza);
+        }
+      }
+
+      function initQuiz() {
+        currentQuestion = 0;
+        pizzaScore = {
+          MARGHERITA: 0,
+          PEPPERONI: 0,
+          VEGGIE: 0,
+          HAWAIIAN: 0,
+          MEAT_LOVERS: 0,
+          SUPREME: 0,
+          BBQ_CHICKEN: 0,
+          BUFFALO: 0,
+          MEXICAN: 0,
+          CHEESE: 0,
+        };
+        showQuestion(currentQuestion);
+      }
+
+      function showQuestion(index) {
+        const container = document.getElementById("question-container");
+        container.innerHTML = "";
+
+        // Add progress bar and question counter
+        const progressHtml = `
+          <div class="question-counter fade-in">Question ${index + 1} of ${
+          questions.length
+        }</div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${
+              ((index + 1) / questions.length) * 100
+            }%"></div>
+          </div>
+        `;
+
+        // Create question element
+        const questionEl = document.createElement("div");
+        questionEl.classList.add("question", "fade-in");
+        questionEl.style.animationDelay = "0.2s";
+        questionEl.textContent = questions[index].question;
+
+        // Create answers grid
+        const answersGrid = document.createElement("div");
+        answersGrid.classList.add("answers-grid");
+
+        // Add answers
+        questions[index].answers.forEach((answer, i) => {
+          const btn = document.createElement("button");
+          btn.classList.add("answer-btn", "fade-in");
+          btn.style.animationDelay = `${0.3 + i * 0.1}s`;
+          btn.innerHTML = `<span class="answer-icon">${answer.icon}</span> ${answer.text}`;
+          btn.addEventListener("click", () => selectAnswer(i));
+          answersGrid.appendChild(btn);
+        });
+
+        // Append all elements
+        container.innerHTML = progressHtml;
+        container.appendChild(questionEl);
+        container.appendChild(answersGrid);
+      }
+
+      function selectAnswer(answerIndex) {
+        // Add scores for selected answer
+        const currentScores = questions[currentQuestion].scores[answerIndex];
+        for (const [pizza, points] of Object.entries(currentScores)) {
+          pizzaScore[pizza] += points;
+        }
+
+        // Get all answer buttons
+        const buttons = document.querySelectorAll(".answer-btn");
+
+        // Animate selection
+        buttons[answerIndex].style.background =
+          "linear-gradient(90deg, #fff9f7, #fff)";
+        buttons[answerIndex].style.borderColor = "var(--primary)";
+        buttons[answerIndex].style.transform = "scale(0.98)";
+
+        // Disable all buttons
+        buttons.forEach((btn) => {
+          btn.style.pointerEvents = "none";
+          if (btn !== buttons[answerIndex]) {
+            btn.style.opacity = "0.7";
+          }
+        });
+
+        // Move to next question or show result
+        setTimeout(() => {
+          if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+          } else {
+            showResult();
+          }
+        }, 700);
+      }
+
+      function createConfetti() {
+        const container = document.getElementById("confetti-container");
+        container.innerHTML = "";
+
+        const colors = [
+          "#ff5722",
+          "#ffc107",
+          "#4caf50",
+          "#2196f3",
+          "#e91e63",
+          "#9c27b0",
+          "#ff9800",
+          "#8bc34a",
+        ];
+
+        const confettiCount = 150;
+
+        for (let i = 0; i < confettiCount; i++) {
+          const confetti = document.createElement("div");
+          confetti.className = "confetti";
+
+          // Random properties
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          const size = Math.random() * 10 + 5;
+          const left = Math.random() * 100;
+
+          confetti.style.backgroundColor = color;
+          confetti.style.left = `${left}%`;
+          confetti.style.top = "-20px";
+          confetti.style.width = `${size}px`;
+          confetti.style.height = `${size}px`;
+
+          // Shape variety
+          const shapes = ["50%", "0%"];
+          confetti.style.borderRadius =
+            shapes[Math.floor(Math.random() * shapes.length)];
+
+          // Animation
+          const duration = Math.random() * 3 + 2;
+          const delay = Math.random() * 2;
+
+          confetti.style.animation = `
+            fall ${duration}s ease-in ${delay}s forwards,
+            sway ${duration / 2}s ease-in-out ${delay}s infinite alternate
+          `;
+
+          container.appendChild(confetti);
+
+          // Create falling animation
+          const keyframes = `
+            @keyframes fall {
+              to { transform: translateY(100vh) rotate(${
+                Math.random() * 360
+              }deg); }
+            }
+            
+            @keyframes sway {
+              from { transform: translateX(-15px) rotate(${
+                Math.random() * 30
+              }deg); }
+              to { transform: translateX(15px) rotate(${
+                Math.random() * 30
+              }deg); }
+            }
+          `;
+
+          const style = document.createElement("style");
+          style.innerHTML = keyframes;
+          document.head.appendChild(style);
+        }
+      }
+
+      function showResult() {
+        const result = calculatePizza();
+        createConfetti();
+
+        const container = document.getElementById("question-container");
+        container.innerHTML = "";
+
+        const resultContainer = document.getElementById("result-container");
+        resultContainer.innerHTML = `
+          <div class="result-header fade-in">The results are in!</div>
+          <div class="pizza-emoji">${result.emoji}</div>
+          <h2 class="pizza-result fade-in" style="animation-delay: 0.4s">${result.name}</h2>
+          <div class="pizza-desc fade-in" style="animation-delay: 0.6s">${result.desc}</div>
+          <button class="retry-btn fade-in" style="animation-delay: 0.8s" onclick="restartQuiz()">
+            <span>Try Again!</span> 🍕
+          </button>
+        `;
+      }
+
+      function restartQuiz() {
+        // Animated transition
+        const quizContainer = document.getElementById("quiz-container");
+        quizContainer.classList.add(
+          "animate__animated",
+          "animate__fadeOutDown"
+        );
+
+        setTimeout(() => {
+          quizContainer.classList.remove(
+            "animate__animated",
+            "animate__fadeOutDown"
+          );
+          quizContainer.classList.add("animate__animated", "animate__fadeInUp");
+          document.getElementById("result-container").innerHTML = "";
+          initQuiz();
+        }, 500);
+      }
+
+      function calculatePizza() {
+        let maxScore = -Infinity;
+        let finalPizzas = [];
+
+        // Find highest scoring pizza(s)
+        for (const [pizza, score] of Object.entries(pizzaScore)) {
+          if (score > maxScore) {
+            maxScore = score;
+            finalPizzas = [pizza];
+          } else if (score === maxScore) {
+            finalPizzas.push(pizza);
+          }
+        }
+
+        // If tie, pick random from top scores
+        const winner =
+          finalPizzas[Math.floor(Math.random() * finalPizzas.length)];
+        return pizzaTypes[winner];
+      }
+
+      // Initialize background and start the quiz
+      window.addEventListener("DOMContentLoaded", () => {
+        createPizzaBackground();
+        initQuiz();
+      });
+    </script>
+  </body>
+</html>
